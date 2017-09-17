@@ -15,6 +15,7 @@ export default class App extends Component {
         this.getProducts = this.getProducts.bind(this);
         this.getCategories = this.getCategories.bind(this);
         this.deleteProduct = this.deleteProduct.bind(this);
+        this.updateProduct = this.updateProduct.bind(this);
     }
 
     componentDidMount() {
@@ -42,7 +43,7 @@ export default class App extends Component {
     }
 
     addProduct(product) {
-        return axios.post('./api/products', product)
+        return axios.post('/api/products', product)
             .then(() => {
                 this.getProducts();
                 this.getCategories();
@@ -50,27 +51,37 @@ export default class App extends Component {
     }
 
     deleteProduct(productId) {
-        const {getProducts} = this;
-        return axios.delete(`./api/products/${productId * 1}`)
-        .then(()=>{
-            this.getProducts();
-            this.getCategories();
-        }).catch(console.log)
+        const { getProducts } = this;
+        return axios.delete(`/api/products/${productId * 1}`)
+            .then(() => {
+                this.getProducts();
+                this.getCategories();
+            }).catch(console.log)
+    }
+
+    updateProduct(productId, product) {
+        axios.put(`/api/products/${productId * 1}`, product)
+            .then(() => {
+                this.getProducts();
+                this.getCategories();
+                // console.log('')
+            }).catch(console.log)
+
     }
 
     render() {
         const { products, categories } = this.state;
-        const { addProduct, deleteProduct } = this;
+        const { addProduct, deleteProduct, updateProduct } = this;
 
         return (
             <div className='container'>
                 <h1>Acme Products &&&& Categories React!!</h1>
                 <div className='row'>
                     <div className='col-sm-6'>
-                        <ProductList deleteProduct = {deleteProduct}  categories={categories} products={products} />
+                        <ProductList updateProduct={updateProduct} deleteProduct={deleteProduct} categories={categories} products={products} />
                     </div>
                     <div className='col-sm-4'>
-                        <ProductForm addProduct={addProduct} categories={categories} />
+                        <ProductForm msg="Add A Product" addProduct={addProduct} products={products} categories={categories} />
                     </div>
                     <div className='col-sm-2'>
                         <Summary categories={categories} products={products} />

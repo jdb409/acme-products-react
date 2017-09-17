@@ -85,6 +85,7 @@ app.get('/api/categories', (req, res, next) => {
 });
 
 app.put('/api/products/:id', (req, res, next) => {
+  console.log(req.body);
   Product.findById(req.params.id)
     .then(product => {
       if (!req.body.categoryId) {

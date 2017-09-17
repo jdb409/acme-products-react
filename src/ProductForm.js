@@ -1,83 +1,92 @@
 import React, { Component } from "react";
 
 export default class ProductForm extends Component {
-    constructor() {
+    constructor(props) {
         super();
 
         this.state = {
-            product: {}
+            name: props.name || "",
+            price: props.price || 0,
+            inStock: props.inStock || false,
+            categoryId: props.categoryId || ""
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.changeProduct = this.changeProduct.bind(this);
+
     }
 
     handleChange(ev) {
-        const { product } = this.state;
-
-        product.price = product.price || 0;
-        product.inStock = false;
-
+        
         switch (ev.target.name) {
             case 'name':
-                product.name = ev.target.value;
+                this.setState({ name: ev.target.value })
                 break;
             case 'price':
-                product.price = ev.target.value;
+                this.setState({ price: ev.target.value })
                 break;
             case 'inStock':
-                
-                ev.target.checked ? product.inStock = true : product.inStock = false;
+                ev.target.checked ? this.setState({ inStock: true }) : this.setState({ inStock: false });
                 break;
             case 'category':
-                if (ev.target.value !== 'No Category') {
-                    product.categoryId = ev.target.value;
+                if (ev.target.value !== 'No category') {
+                    this.setState({ categoryId: ev.target.value })
                 }
                 break;
         }
     }
 
+    changeProduct(ev) {
+        ev.preventDefault();
+        this.props.updateProduct(this.props.productId, this.state);
+        
+    }
 
     handleSubmit(ev) {
         const { addProduct } = this.props;
-        const { product } = this.state;
-
         ev.preventDefault();
-        addProduct(product)
+        addProduct(this.state)
             .then(() => {
-                document.getElementById("form").reset();
+                this.setState({ name: "" })
+                this.setState({ price: 0 })
+                this.setState({ inStock: false })
+                this.setState({ category: "No Category" })
             })
     }
 
     render() {
-        const { categories } = this.props;
-        const { handleChange, handleSubmit } = this;
-
+        const { categories , msg, productId} = this.props;
+        const { handleChange, handleSubmit, changeProduct } = this;
+        const { name, price, inStock, categoryId } = this.state;
+        // console.log(productId);
         return (
             <div className="panel panel-default">
-                <div className="panel panel-heading">Add a product</div>
+                <div className="panel panel-heading">{msg}</div>
                 <div className="panel panel-body">
-                    <form id='form' onSubmit={handleSubmit}>
+                    <form id='form' onSubmit= {productId ? changeProduct : handleSubmit}>
                         <label htmlFor="name">Name</label>
-                        <input type="text" name="name" className="form-control" onChange={handleChange} />
+                        <input value={name} type="text" name="name" className="form-control" onChange={handleChange} />
                         <label htmlFor="price">Price</label>
-                        <input type="number" name="price" className="form-control" onChange={handleChange} />
+                        <input value={price} type="number" name="price" className="form-control" onChange={handleChange} />
                         <label htmlFor="inStock">InStock</label>
-                        <input type="checkBox" name="inStock" className="form-control" onChange={handleChange} />
-                        <label htmlFor="category">Category</label>
-                        <select name="category" className="form-control" onChange={handleChange}>
-                            <option>No category</option>
-                            {
-                                categories.map(category => {
-                                    return <option key={category.id} value={category.id}>{category.name}</option>
-                                })
-                            }
-                        </select>
-                        <br />
-                        <button className='btn btn-primary'>Add Product</button>
+                        <input value={inStock} type="checkBox" name="inStock" className="form-control" onChange={handleChange} defaultChecked={this.props.inStock || inStock} />
+                            <label htmlFor="category">Category</label>
+                            <select value={categoryId} name="category" className="form-control" onChange={handleChange}>
+                                <option>No category</option>
+                                {
+                                    categories.map(category => {
+                                        return <option key={category.id} value={category.id}>{category.name}</option>
+                                    })
+                                }
+                            </select>
+                            <br />
+                            
+                            <button className='btn btn-primary'>Save</button>
+                            
                     </form>
                 </div>
-            </div>
-        );
+                </div>
+                );
     }
 }
 

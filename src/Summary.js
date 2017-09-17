@@ -10,13 +10,15 @@ const Summary = (props) => {
             <li className='list-group-item'>There are {products.length} products</li>
             <li className='list-group-item'>
                 Categories:
-                {
-                    categories.map(category => {
-                        return (
-                            <li key={category.id}>{category.name} has {category.products.length} products </li>
-                        );
-                    })
-                }
+                <ul>
+                    {
+                        categories.map(category => {
+                            return (
+                                <li key={category.id}>{category.name} has {category.products.length} products </li>
+                            );
+                        })
+                    }
+                </ul>
             </li>
             <li className='list-group-item'>The most expensive product is {expensiveProduct[0] ? expensiveProduct[0].name : null} at {expensiveProduct[0] ? expensiveProduct[0].price : null} </li>
             <li className='list-group-item'>Products not in stock are {notInStock}</li>
