@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "npm run webpack",
     "webpack": "./node_modules/webpack/bin/webpack.js",
-    "start": "npm run webpack -- -w & nodemon --ignore src/ --ignore /dist server.js"
+    "start:dev": "npm run webpack -- -w & nodemon --ignore src/ --ignore /dist server.js"
     
   },
   "keywords": [],
