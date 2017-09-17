@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 export default class ProductForm extends Component {
     constructor() {
@@ -8,42 +8,42 @@ export default class ProductForm extends Component {
         }
         this.handleChange = this.handleChange.bind(this);
     }
-    handleChange(ev){
+    handleChange(ev) {
         this.setState({
             category: ev.target.value
         })
     }
     render() {
-        const {products, categories} = this.props;
+        const { products, categories } = this.props;
         console.log(products);
         return (
-            <ul className='list-group'>
-                {
-                    products.map(product => {
-                        return (
-                            <li className='list-group-item' key={product.id}>
-                                <p>{product.name}</p>
-                                <p>{product.price}</p>
-                                <label htmlFor='inStock'>InStock </label>
-                                <br />
-                                <input type='checkbox' name='inStock' defaultChecked={product.inStock} />
-                                <select defaultValue={product.categoryId ? product.category.name : null}>
-                                <option>No Category</option>
-                                    {categories.map(category => {
-                                        return (
-                                            <option key={category.id}>{category.name}</option>
-                                        )
-                                    })}
-                                </select>
-
-                            </li>
-                        );
-                    })
-                }
-            </ul>
+            <div className='row'>
+                <ul className='list-group'>
+                    {
+                        products.map(product => {
+                            return (
+                                <div key={product.id} className='col-sm-4'>
+                                    <li className='list-group-item'>
+                                        <p>{product.name}</p>
+                                        <p>{product.price}</p>
+                                        <label htmlFor='inStock'>InStock </label>
+                                        <br />
+                                        <input type='checkbox' name='inStock' defaultChecked={product.inStock} />
+                                        <select defaultValue={product.categoryId ? product.category.name : null}>
+                                            <option>No Category</option>
+                                            {categories.map(category => {
+                                                return (
+                                                    <option key={category.id}>{category.name}</option>
+                                                )
+                                            })}
+                                        </select>
+                                    </li>
+                                </div>
+                            );
+                        })
+                    }
+                </ul>
+            </div>
         );
     }
 }
-
-
-// <p>{product.category ? product.category.name : 'No Category'}</p>

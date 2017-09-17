@@ -27,36 +27,38 @@ export default class ProductForm extends Component {
                 ev.target.checked ? product.inStock = true : product.inStock = false;
                 break;
             case 'category':
-                if (ev.target.value !=='No Category') {
+                if (ev.target.value !== 'No Category') {
                     product.categoryId = ev.target.value;
                 }
-                    
                 break;
         }
-
-        // console.log(product);
-
     }
+
 
     handleSubmit(ev) {
         const { addProduct } = this.props;
         const { product } = this.state;
 
         ev.preventDefault();
-        addProduct(product);
+        addProduct(product)
+            .then(() => {
+                document.getElementById("form").reset();
+            })
+
+
     }
 
 
     render() {
-
         const { categories } = this.props;
         const { handleChange, handleSubmit } = this;
-        
+        const { product } = this.state;
+
         return (
             <div className="panel panel-default">
                 <div className="panel panel-heading">Add a product</div>
                 <div className="panel panel-body">
-                    <form onSubmit={handleSubmit}>
+                    <form id='form' onSubmit={handleSubmit}>
                         <label htmlFor="name">Name</label>
                         <input type="text" name="name" className="form-control" onChange={handleChange} />
                         <label htmlFor="price">Price</label>
