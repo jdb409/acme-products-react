@@ -15,6 +15,7 @@ export default class ProductForm extends Component {
         const { product } = this.state;
 
         product.price = product.price || 0;
+        product.inStock = false;
 
         switch (ev.target.name) {
             case 'name':
@@ -24,6 +25,7 @@ export default class ProductForm extends Component {
                 product.price = ev.target.value;
                 break;
             case 'inStock':
+                
                 ev.target.checked ? product.inStock = true : product.inStock = false;
                 break;
             case 'category':
@@ -44,15 +46,11 @@ export default class ProductForm extends Component {
             .then(() => {
                 document.getElementById("form").reset();
             })
-
-
     }
-
 
     render() {
         const { categories } = this.props;
         const { handleChange, handleSubmit } = this;
-        const { product } = this.state;
 
         return (
             <div className="panel panel-default">

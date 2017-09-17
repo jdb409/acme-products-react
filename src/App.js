@@ -14,6 +14,7 @@ export default class App extends Component {
         this.addProduct = this.addProduct.bind(this);
         this.getProducts = this.getProducts.bind(this);
         this.getCategories = this.getCategories.bind(this);
+        this.deleteProduct = this.deleteProduct.bind(this);
     }
 
     componentDidMount() {
@@ -32,7 +33,7 @@ export default class App extends Component {
     }
 
     getProducts() {
-        axios.get('/api/products')
+        return axios.get('/api/products')
             .then(prod => prod.data)
             .then(products => {
                 this.setState({ products })
@@ -48,16 +49,25 @@ export default class App extends Component {
             }).catch(console.log);
     }
 
+    deleteProduct(productId) {
+        const {getProducts} = this;
+        return axios.delete(`./api/products/${productId * 1}`)
+        .then(()=>{
+            this.getProducts();
+            this.getCategories();
+        }).catch(console.log)
+    }
+
     render() {
         const { products, categories } = this.state;
-        const { addProduct } = this;
+        const { addProduct, deleteProduct } = this;
 
         return (
             <div className='container'>
                 <h1>Acme Products &&&& Categories React!!</h1>
                 <div className='row'>
                     <div className='col-sm-6'>
-                        <ProductList categories={categories} products={products} />
+                        <ProductList deleteProduct = {deleteProduct}  categories={categories} products={products} />
                     </div>
                     <div className='col-sm-4'>
                         <ProductForm addProduct={addProduct} categories={categories} />

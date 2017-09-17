@@ -23127,6 +23127,7 @@ var App = function (_Component) {
         _this.addProduct = _this.addProduct.bind(_this);
         _this.getProducts = _this.getProducts.bind(_this);
         _this.getCategories = _this.getCategories.bind(_this);
+        _this.deleteProduct = _this.deleteProduct.bind(_this);
         return _this;
     }
 
@@ -23153,7 +23154,7 @@ var App = function (_Component) {
         value: function getProducts() {
             var _this3 = this;
 
-            _axios2.default.get('/api/products').then(function (prod) {
+            return _axios2.default.get('/api/products').then(function (prod) {
                 return prod.data;
             }).then(function (products) {
                 _this3.setState({ products: products });
@@ -23170,12 +23171,25 @@ var App = function (_Component) {
             }).catch(console.log);
         }
     }, {
+        key: 'deleteProduct',
+        value: function deleteProduct(productId) {
+            var _this5 = this;
+
+            var getProducts = this.getProducts;
+
+            return _axios2.default.delete('./api/products/' + productId * 1).then(function () {
+                _this5.getProducts();
+                _this5.getCategories();
+            }).catch(console.log);
+        }
+    }, {
         key: 'render',
         value: function render() {
             var _state = this.state,
                 products = _state.products,
                 categories = _state.categories;
-            var addProduct = this.addProduct;
+            var addProduct = this.addProduct,
+                deleteProduct = this.deleteProduct;
 
 
             return _react2.default.createElement(
@@ -23192,7 +23206,7 @@ var App = function (_Component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'col-sm-6' },
-                        _react2.default.createElement(_ProductList2.default, { categories: categories, products: products })
+                        _react2.default.createElement(_ProductList2.default, { deleteProduct: deleteProduct, categories: categories, products: products })
                     ),
                     _react2.default.createElement(
                         'div',
@@ -24124,6 +24138,7 @@ var ProductForm = function (_Component) {
         _this.state = {
             category: {}
         };
+        _this.handleDelete = _this.handleDelete.bind(_this);
         _this.handleChange = _this.handleChange.bind(_this);
         return _this;
     }
@@ -24136,13 +24151,20 @@ var ProductForm = function (_Component) {
             });
         }
     }, {
+        key: 'handleDelete',
+        value: function handleDelete(productId) {
+            this.props.deleteProduct(productId);
+        }
+    }, {
         key: 'render',
         value: function render() {
+            var _this2 = this;
+
             var _props = this.props,
                 products = _props.products,
                 categories = _props.categories;
 
-            console.log(products);
+
             return _react2.default.createElement(
                 'div',
                 { className: 'row' },
@@ -24188,6 +24210,18 @@ var ProductForm = function (_Component) {
                                             category.name
                                         );
                                     })
+                                ),
+                                _react2.default.createElement(
+                                    'button',
+                                    { className: 'btn btn-info' },
+                                    'Save'
+                                ),
+                                _react2.default.createElement(
+                                    'button',
+                                    { className: 'btn btn-danger', onClick: function onClick() {
+                                            return _this2.handleDelete(product.id);
+                                        } },
+                                    'Delete'
                                 )
                             )
                         );
@@ -24250,6 +24284,7 @@ var ProductForm = function (_Component) {
 
 
             product.price = product.price || 0;
+            product.inStock = false;
 
             switch (ev.target.name) {
                 case 'name':
@@ -24259,6 +24294,7 @@ var ProductForm = function (_Component) {
                     product.price = ev.target.value;
                     break;
                 case 'inStock':
+
                     ev.target.checked ? product.inStock = true : product.inStock = false;
                     break;
                 case 'category':
@@ -24286,7 +24322,6 @@ var ProductForm = function (_Component) {
             var categories = this.props.categories;
             var handleChange = this.handleChange,
                 handleSubmit = this.handleSubmit;
-            var product = this.state.product;
 
 
             return _react2.default.createElement(

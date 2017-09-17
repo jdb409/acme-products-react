@@ -6,6 +6,7 @@ export default class ProductForm extends Component {
         this.state = {
             category: {}
         }
+        this.handleDelete = this.handleDelete.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
     handleChange(ev) {
@@ -13,9 +14,14 @@ export default class ProductForm extends Component {
             category: ev.target.value
         })
     }
+
+    handleDelete(productId) {
+        this.props.deleteProduct(productId);
+    }
+
     render() {
         const { products, categories } = this.props;
-        console.log(products);
+        
         return (
             <div className='row'>
                 <ul className='list-group'>
@@ -37,6 +43,10 @@ export default class ProductForm extends Component {
                                                 )
                                             })}
                                         </select>
+
+                                        <button className='btn btn-info'>Save</button>
+
+                                        <button className='btn btn-danger' onClick={() => this.handleDelete(product.id)}>Delete</button>
                                     </li>
                                 </div>
                             );
