@@ -9,7 +9,8 @@ export default class App extends Component {
         super();
         this.state = {
             products: [],
-            categories: []
+            categories: [],
+            err: ''
         }
         this.addProduct = this.addProduct.bind(this);
         this.getProducts = this.getProducts.bind(this);
@@ -20,10 +21,9 @@ export default class App extends Component {
 
     componentDidMount() {
         this.getCategories()
-
         this.getProducts();
-
     }
+
     getCategories() {
         axios.get('/api/categories')
             .then(cat => cat.data)
@@ -34,7 +34,7 @@ export default class App extends Component {
     }
 
     getProducts() {
-        return axios.get('/api/products')
+        axios.get('/api/products')
             .then(prod => prod.data)
             .then(products => {
                 this.setState({ products })
@@ -47,12 +47,15 @@ export default class App extends Component {
             .then(() => {
                 this.getProducts();
                 this.getCategories();
-            }).catch(console.log);
+                this.setState({err:""})
+            }).catch(err => {
+                this.setState({ err: err.response.data });
+            });
     }
 
     deleteProduct(productId) {
-        const { getProducts } = this;
-        return axios.delete(`/api/products/${productId * 1}`)
+
+        axios.delete(`/api/products/${productId * 1}`)
             .then(() => {
                 this.getProducts();
                 this.getCategories();
@@ -64,13 +67,12 @@ export default class App extends Component {
             .then(() => {
                 this.getProducts();
                 this.getCategories();
-                // console.log('')
             }).catch(console.log)
 
     }
 
     render() {
-        const { products, categories } = this.state;
+        const { products, categories, err } = this.state;
         const { addProduct, deleteProduct, updateProduct } = this;
 
         return (
@@ -81,7 +83,7 @@ export default class App extends Component {
                         <ProductList updateProduct={updateProduct} deleteProduct={deleteProduct} categories={categories} products={products} />
                     </div>
                     <div className='col-sm-4'>
-                        <ProductForm msg="Add A Product" addProduct={addProduct} products={products} categories={categories} />
+                        <ProductForm msg="Add A Product" addProduct={addProduct} products={products} categories={categories} err={err} />
                     </div>
                     <div className='col-sm-2'>
                         <Summary categories={categories} products={products} />

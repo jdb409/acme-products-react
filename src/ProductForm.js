@@ -8,10 +8,12 @@ export default class ProductForm extends Component {
             name: props.name || "",
             price: props.price || 0,
             inStock: props.inStock || false,
-            categoryId: props.categoryId || ""
+            categoryId: props.categoryId || "",
+            err: ""
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
         this.changeProduct = this.changeProduct.bind(this);
 
     }
@@ -39,11 +41,12 @@ export default class ProductForm extends Component {
     changeProduct(ev) {
         ev.preventDefault();
         this.props.updateProduct(this.props.productId, this.state);
-        
+
     }
 
     handleSubmit(ev) {
-        const { addProduct } = this.props;
+        const { addProduct, err } = this.props;
+        this.setState({ err });
         ev.preventDefault();
         addProduct(this.state)
             .then(() => {
@@ -54,39 +57,47 @@ export default class ProductForm extends Component {
             })
     }
 
+    handleDelete(ev) {
+        ev.preventDefault();
+        this.props.deleteProduct(this.props.productId * 1);
+    }
+
     render() {
-        const { categories , msg, productId} = this.props;
+        const { categories, msg, productId, err } = this.props;
         const { handleChange, handleSubmit, changeProduct } = this;
         const { name, price, inStock, categoryId } = this.state;
-        // console.log(productId);
+
+
         return (
             <div className="panel panel-default">
                 <div className="panel panel-heading">{msg}</div>
                 <div className="panel panel-body">
-                    <form id='form' onSubmit= {productId ? changeProduct : handleSubmit}>
+                    {err && <p className = 'well'>{err}</p>}
+                    <form id='form' onSubmit={productId ? changeProduct : handleSubmit}>
                         <label htmlFor="name">Name</label>
                         <input value={name} type="text" name="name" className="form-control" onChange={handleChange} />
                         <label htmlFor="price">Price</label>
                         <input value={price} type="number" name="price" className="form-control" onChange={handleChange} />
                         <label htmlFor="inStock">InStock</label>
                         <input value={inStock} type="checkBox" name="inStock" className="form-control" onChange={handleChange} defaultChecked={this.props.inStock || inStock} />
-                            <label htmlFor="category">Category</label>
-                            <select value={categoryId} name="category" className="form-control" onChange={handleChange}>
-                                <option>No category</option>
-                                {
-                                    categories.map(category => {
-                                        return <option key={category.id} value={category.id}>{category.name}</option>
-                                    })
-                                }
-                            </select>
-                            <br />
-                            
-                            <button className='btn btn-primary'>Save</button>
-                            
+                        <label htmlFor="category">Category</label>
+                        <select value={categoryId} name="category" className="form-control" onChange={handleChange}>
+                            <option>No category</option>
+                            {
+                                categories.map(category => {
+                                    return <option key={category.id} value={category.id}>{category.name}</option>
+                                })
+                            }
+                        </select>
+                        <br />
+
+                        <button className='btn btn-primary'>Save</button>
+                        {productId && <button className='btn btn-danger' onClick={this.handleDelete}>Delete</button>}
+
                     </form>
                 </div>
-                </div>
-                );
+            </div>
+        );
     }
 }
 

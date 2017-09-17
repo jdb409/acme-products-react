@@ -10459,10 +10459,12 @@ var ProductForm = function (_Component) {
             name: props.name || "",
             price: props.price || 0,
             inStock: props.inStock || false,
-            categoryId: props.categoryId || ""
+            categoryId: props.categoryId || "",
+            err: ""
         };
         _this.handleChange = _this.handleChange.bind(_this);
         _this.handleSubmit = _this.handleSubmit.bind(_this);
+        _this.handleDelete = _this.handleDelete.bind(_this);
         _this.changeProduct = _this.changeProduct.bind(_this);
 
         return _this;
@@ -10500,8 +10502,11 @@ var ProductForm = function (_Component) {
         value: function handleSubmit(ev) {
             var _this2 = this;
 
-            var addProduct = this.props.addProduct;
+            var _props = this.props,
+                addProduct = _props.addProduct,
+                err = _props.err;
 
+            this.setState({ err: err });
             ev.preventDefault();
             addProduct(this.state).then(function () {
                 _this2.setState({ name: "" });
@@ -10511,12 +10516,19 @@ var ProductForm = function (_Component) {
             });
         }
     }, {
+        key: "handleDelete",
+        value: function handleDelete(ev) {
+            ev.preventDefault();
+            this.props.deleteProduct(this.props.productId * 1);
+        }
+    }, {
         key: "render",
         value: function render() {
-            var _props = this.props,
-                categories = _props.categories,
-                msg = _props.msg,
-                productId = _props.productId;
+            var _props2 = this.props,
+                categories = _props2.categories,
+                msg = _props2.msg,
+                productId = _props2.productId,
+                err = _props2.err;
             var handleChange = this.handleChange,
                 handleSubmit = this.handleSubmit,
                 changeProduct = this.changeProduct;
@@ -10525,7 +10537,7 @@ var ProductForm = function (_Component) {
                 price = _state.price,
                 inStock = _state.inStock,
                 categoryId = _state.categoryId;
-            // console.log(productId);
+
 
             return _react2.default.createElement(
                 "div",
@@ -10538,6 +10550,11 @@ var ProductForm = function (_Component) {
                 _react2.default.createElement(
                     "div",
                     { className: "panel panel-body" },
+                    err && _react2.default.createElement(
+                        "p",
+                        { className: "well" },
+                        err
+                    ),
                     _react2.default.createElement(
                         "form",
                         { id: "form", onSubmit: productId ? changeProduct : handleSubmit },
@@ -10585,6 +10602,11 @@ var ProductForm = function (_Component) {
                             "button",
                             { className: "btn btn-primary" },
                             "Save"
+                        ),
+                        productId && _react2.default.createElement(
+                            "button",
+                            { className: "btn btn-danger", onClick: this.handleDelete },
+                            "Delete"
                         )
                     )
                 )
@@ -23297,7 +23319,8 @@ var App = function (_Component) {
 
         _this.state = {
             products: [],
-            categories: []
+            categories: [],
+            err: ''
         };
         _this.addProduct = _this.addProduct.bind(_this);
         _this.getProducts = _this.getProducts.bind(_this);
@@ -23311,7 +23334,6 @@ var App = function (_Component) {
         key: 'componentDidMount',
         value: function componentDidMount() {
             this.getCategories();
-
             this.getProducts();
         }
     }, {
@@ -23330,7 +23352,7 @@ var App = function (_Component) {
         value: function getProducts() {
             var _this3 = this;
 
-            return _axios2.default.get('/api/products').then(function (prod) {
+            _axios2.default.get('/api/products').then(function (prod) {
                 return prod.data;
             }).then(function (products) {
                 _this3.setState({ products: products });
@@ -23344,16 +23366,17 @@ var App = function (_Component) {
             return _axios2.default.post('/api/products', product).then(function () {
                 _this4.getProducts();
                 _this4.getCategories();
-            }).catch(console.log);
+                _this4.setState({ err: "" });
+            }).catch(function (err) {
+                _this4.setState({ err: err.response.data });
+            });
         }
     }, {
         key: 'deleteProduct',
         value: function deleteProduct(productId) {
             var _this5 = this;
 
-            var getProducts = this.getProducts;
-
-            return _axios2.default.delete('/api/products/' + productId * 1).then(function () {
+            _axios2.default.delete('/api/products/' + productId * 1).then(function () {
                 _this5.getProducts();
                 _this5.getCategories();
             }).catch(console.log);
@@ -23366,7 +23389,6 @@ var App = function (_Component) {
             _axios2.default.put('/api/products/' + productId * 1, product).then(function () {
                 _this6.getProducts();
                 _this6.getCategories();
-                // console.log('')
             }).catch(console.log);
         }
     }, {
@@ -23374,7 +23396,8 @@ var App = function (_Component) {
         value: function render() {
             var _state = this.state,
                 products = _state.products,
-                categories = _state.categories;
+                categories = _state.categories,
+                err = _state.err;
             var addProduct = this.addProduct,
                 deleteProduct = this.deleteProduct,
                 updateProduct = this.updateProduct;
@@ -23399,7 +23422,7 @@ var App = function (_Component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'col-sm-4' },
-                        _react2.default.createElement(_ProductForm2.default, { msg: 'Add A Product', addProduct: addProduct, products: products, categories: categories })
+                        _react2.default.createElement(_ProductForm2.default, { msg: 'Add A Product', addProduct: addProduct, products: products, categories: categories, err: err })
                     ),
                     _react2.default.createElement(
                         'div',
@@ -24301,8 +24324,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = __webpack_require__(21);
 
 var _react2 = _interopRequireDefault(_react);
@@ -24313,102 +24334,23 @@ var _ProductForm2 = _interopRequireDefault(_ProductForm);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ProductList = function (_Component) {
-    _inherits(ProductList, _Component);
-
-    function ProductList() {
-        _classCallCheck(this, ProductList);
-
-        var _this = _possibleConstructorReturn(this, (ProductList.__proto__ || Object.getPrototypeOf(ProductList)).call(this));
-
-        _this.state = {
-            category: {}
-
-        };
-        _this.handleDelete = _this.handleDelete.bind(_this);
-
-        return _this;
-    }
-
-    _createClass(ProductList, [{
-        key: 'handleDelete',
-        value: function handleDelete(productId) {
-            this.props.deleteProduct(productId);
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var _this2 = this;
-
-            var _props = this.props,
-                products = _props.products,
-                categories = _props.categories;
+var ProductList = function ProductList(props) {
+    var products = props.products,
+        categories = props.categories;
 
 
+    return _react2.default.createElement(
+        'div',
+        { className: 'row' },
+        products.length > 0 && products.map(function (product) {
             return _react2.default.createElement(
                 'div',
-                { className: 'row' },
-                products.length > 0 && products.map(function (product) {
-                    return _react2.default.createElement(
-                        'div',
-                        { key: product.id, className: 'col-sm-4 panel panel-default' },
-                        _react2.default.createElement(_ProductForm2.default, { updateProduct: _this2.props.updateProduct, productId: product.id, name: product.name, price: product.price, inStock: product.inStock, categoryId: product.categoryId, categories: categories }),
-                        _react2.default.createElement(
-                            'button',
-                            { className: 'btn btn-danger', onClick: function onClick() {
-                                    return _this2.handleDelete(product.id);
-                                } },
-                            'Delete'
-                        )
-                    );
-                })
+                { key: product.id, className: 'col-sm-4' },
+                _react2.default.createElement(_ProductForm2.default, { deleteProduct: props.deleteProduct, updateProduct: props.updateProduct, productId: product.id, name: product.name, price: product.price, inStock: product.inStock, categoryId: product.categoryId, categories: categories })
             );
-        }
-    }]);
-
-    return ProductList;
-}(_react.Component);
-
-// <button className='btn btn-success' onClick={() => this.changeProduct(product.id, product)}>Save</button>
-
-// <div className='row'>
-// <ul className='list-group'>
-//     {
-//         products.map(product => {
-//             return (
-//                 <div key={product.id} className='col-sm-4'>
-//                     <li className='list-group-item'>
-//                         <p>{product.name}</p>
-//                         <p>{product.price}</p>
-//                         <label htmlFor='inStock'>InStock </label>
-//                         <br />
-//                         <input type='checkbox' name='inStock' defaultChecked={product.inStock} />
-//                         <select defaultValue={product.categoryId ? product.category.name : null}>
-//                             <option>No Category</option>
-//                             {categories.map(category => {
-//                                 return (
-//                                     <option key={category.id}>{category.name}</option>
-//                                 )
-//                             })}
-//                         </select>
-
-//                         <button className='btn btn-info'>Save</button>
-
-//                         <button className='btn btn-danger' onClick={() => this.handleDelete(product.id)}>Delete</button>
-//                     </li>
-//                 </div>
-//             );
-//         })
-//     }
-// </ul>
-// </div>
-
+        })
+    );
+};
 
 exports.default = ProductList;
 

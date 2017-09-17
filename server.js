@@ -111,7 +111,7 @@ app.delete('/api/products/:id', (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  res.status(err.status || 500).send(err);
+  res.status(err.status || 500).send(err.errors[0].message);
 
 });
 
